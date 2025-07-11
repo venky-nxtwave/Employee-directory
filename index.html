@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Directory</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Employee Directory</h1>
+        <div class="controls">
+            <input type="text" id="search" placeholder="Search employees...">
+            <button id="filter-btn">Filters</button>
+            <button id="add-employee">Add Employee</button>
+        </div>
+    </header>
+
+    <div class="filter-panel hidden" id="filter-panel">
+        <h3>Filter Employees</h3>
+        <div class="filter-group">
+            <label for="department-filter">Department:</label>
+            <select id="department-filter">
+                <option value="">All Departments</option>
+                <option value="HR">HR</option>
+                <option value="IT">IT</option>
+                <option value="Finance">Finance</option>
+                <option value="Marketing">Marketing</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="role-filter">Role:</label>
+            <select id="role-filter">
+                <option value="">All Roles</option>
+                <option value="Manager">Manager</option>
+                <option value="Developer">Developer</option>
+                <option value="Analyst">Analyst</option>
+                <option value="Designer">Designer</option>
+            </select>
+        </div>
+        <button id="apply-filters">Apply Filters</button>
+        <button id="reset-filters">Reset</button>
+    </div>
+
+    <div class="sort-controls">
+        <label for="sort-by">Sort by:</label>
+        <select id="sort-by">
+            <option value="firstName">First Name (A-Z)</option>
+            <option value="firstNameDesc">First Name (Z-A)</option>
+            <option value="lastName">Last Name (A-Z)</option>
+            <option value="lastNameDesc">Last Name (Z-A)</option>
+            <option value="department">Department (A-Z)</option>
+            <option value="departmentDesc">Department (Z-A)</option>
+        </select>
+    </div>
+
+    <main>
+        <div class="employee-list" id="employee-list">
+            <!-- Employee cards will be inserted here by JavaScript -->
+        </div>
+    </main>
+
+    <div class="pagination">
+        <button id="prev-page">Previous</button>
+        <span id="page-info">Page 1 of 1</span>
+        <button id="next-page">Next</button>
+        <select id="items-per-page">
+            <option value="5">5 per page</option>
+            <option value="10" selected>10 per page</option>
+            <option value="20">20 per page</option>
+            <option value="50">50 per page</option>
+        </select>
+    </div>
+
+    <!-- Add/Edit Employee Modal -->
+    <div class="modal hidden" id="employee-form-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="form-title">Add New Employee</h2>
+            <form id="employee-form">
+                <input type="hidden" id="employee-id">
+                <div class="form-group">
+                    <label for="first-name">First Name*</label>
+                    <input type="text" id="first-name" required>
+                    <div class="error-message" id="first-name-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="last-name">Last Name*</label>
+                    <input type="text" id="last-name" required>
+                    <div class="error-message" id="last-name-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email*</label>
+                    <input type="email" id="email" required>
+                    <div class="error-message" id="email-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="department">Department*</label>
+                    <select id="department" required>
+                        <option value="">Select Department</option>
+                        <option value="HR">HR</option>
+                        <option value="IT">IT</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Marketing">Marketing</option>
+                    </select>
+                    <div class="error-message" id="department-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role*</label>
+                    <input type="text" id="role" required>
+                    <div class="error-message" id="role-error"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancel-btn">Cancel</button>
+                    <button type="submit" id="save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
+
+<!--
+index.fthl
+freeMarker template
+This file is used to render the employee directory page with dynamic data.
+This file is processed by the FreeMarker template engine to generate the final HTML.
+This file includes employee data, search functionality, filtering options, sorting controls, and pagination.
+This file also includes a modal for adding or editing employee details.
+This file is structured to be compatible with the FreeMarker syntax, allowing for dynamic content rendering.
+This file is not a standalone HTML file but rather a template that will be processed by the FreeMarker engine.
+This file is designed to be used in a web application that utilizes FreeMarker for server-side rendering.
+This file includes a header, main content area, and footer, with specific sections for employee information and controls.
+This file is intended to be served by a web server that supports FreeMarker templates.
+This file is part of a larger web application that manages employee data and provides an interface for users to interact with that data.
+This file is not meant to be edited directly but rather used as a template for generating dynamic content.
+This file is structured to allow for easy updates and modifications to the employee directory without changing the underlying HTML structure.
+This file is designed to be responsive and user-friendly, allowing users to easily navigate and manage employee information.
+This file includes JavaScript functionality for handling user interactions, such as searching, filtering, sorting, and pagination.
+This file is part of a web application.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Directory</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <#assign employees = [
+        {"id":1, "firstName":"John", "lastName":"Doe", "email":"john.doe@example.com", "department":"HR", "role":"Manager"},
+        {"id":2, "firstName":"Jane", "lastName":"Smith", "email":"jane.smith@example.com", "department":"IT", "role":"Developer"},
+        {"id":3, "firstName":"Robert", "lastName":"Johnson", "email":"robert.j@example.com", "department":"Finance", "role":"Analyst"}
+    ]>
+
+    <header>
+        <h1>Employee Directory</h1>
+        <div class="controls">
+            <input type="text" id="search" placeholder="Search employees...">
+            <button id="filter-btn">Filters</button>
+            <button id="add-employee">Add Employee</button>
+        </div>
+    </header>
+
+    <div class="filter-panel hidden" id="filter-panel">
+        <h3>Filter Employees</h3>
+        <div class="filter-group">
+            <label for="department-filter">Department:</label>
+            <select id="department-filter">
+                <option value="">All Departments</option>
+                <#list employees as emp>
+                    <option value="${emp.department}">${emp.department}</option>
+                </#list>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="role-filter">Role:</label>
+            <select id="role-filter">
+                <option value="">All Roles</option>
+                <#list employees as emp>
+                    <option value="${emp.role}">${emp.role}</option>
+                </#list>
+            </select>
+        </div>
+        <button id="apply-filters">Apply Filters</button>
+        <button id="reset-filters">Reset</button>
+    </div>
+
+    <div class="sort-controls">
+        <label for="sort-by">Sort by:</label>
+        <select id="sort-by">
+            <option value="firstName">First Name (A-Z)</option>
+            <option value="firstNameDesc">First Name (Z-A)</option>
+            <option value="lastName">Last Name (A-Z)</option>
+            <option value="lastNameDesc">Last Name (Z-A)</option>
+            <option value="department">Department (A-Z)</option>
+            <option value="departmentDesc">Department (Z-A)</option>
+        </select>
+    </div>
+
+    <main>
+        <div class="employee-list" id="employee-list">
+            <#list employees as employee>
+                <div class="employee-card" data-employee-id="${employee.id}">
+                    <h3>${employee.firstName} ${employee.lastName}</h3>
+                    <p>ID: ${employee.id}</p>
+                    <p>Email: ${employee.email}</p>
+                    <p>Department: ${employee.department}</p>
+                    <p>Role: ${employee.role}</p>
+                    <div class="employee-actions">
+                        <button class="edit-btn" data-id="${employee.id}">Edit</button>
+                        <button class="delete-btn" data-id="${employee.id}">Delete</button>
+                    </div>
+                </div>
+            </#list>
+        </div>
+    </main>
+
+    <div class="pagination">
+        <button id="prev-page">Previous</button>
+        <span id="page-info">Page 1 of 1</span>
+        <button id="next-page">Next</button>
+        <select id="items-per-page">
+            <option value="5">5 per page</option>
+            <option value="10" selected>10 per page</option>
+            <option value="20">20 per page</option>
+            <option value="50">50 per page</option>
+        </select>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+-->
+
+<!--
+employee-form.ftlh
+freeMarker template 
+This file is used to render the employee form for adding or editing employee details.
+This file is processed by the FreeMarker template engine to generate the final HTML.
+This file includes form fields for employee information such as first name, last name, email, department, and role.
+This file is structured to be compatible with the FreeMarker syntax, allowing for dynamic content rendering.
+This file is not a standalone HTML file but rather a template that will be processed by the FreeMarker engine.
+This file is designed to be used in a web application that utilizes FreeMarker for server-side rendering.
+This file includes a form with input fields, validation messages, and buttons for saving or canceling the form.
+This file is intended to be served by a web server that supports FreeMarker templates.
+This file is part of a larger web application that manages employee data and provides an interface for users to add or edit employee information.
+This file is not meant to be edited directly but rather used as a template for generating dynamic content.
+This file is structured to allow for easy updates and modifications to the employee form without changing the underlying HTML structure.
+This file is designed to be responsive and user-friendly, allowing users to easily input and edit employee details.
+This file includes JavaScript functionality for handling form submission, validation, and interaction with the employee directory.
+This file is part of a web application that provides a user interface for managing employee records.
+This file is designed to be compatible with the FreeMarker template engine, allowing for dynamic data binding and rendering.
+This file includes a header, form fields, and buttons for user interaction.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><#if isEdit??>Edit<#else>Add</#if> Employee</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1><#if isEdit??>Edit<#else>Add New</#if> Employee</h1>
+        <form id="employee-form">
+            <input type="hidden" id="employee-id" value="${employee.id!''}">
+            
+            <div class="form-group">
+                <label for="first-name">First Name*</label>
+                <input type="text" id="first-name" value="${employee.firstName!''}" required>
+                <div class="error-message" id="first-name-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="last-name">Last Name*</label>
+                <input type="text" id="last-name" value="${employee.lastName!''}" required>
+                <div class="error-message" id="last-name-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email*</label>
+                <input type="email" id="email" value="${employee.email!''}" required>
+                <div class="error-message" id="email-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="department">Department*</label>
+                <select id="department" required>
+                    <option value="">Select Department</option>
+                    <option value="HR" <#if employee.department?? && employee.department == "HR">selected</#if>>HR</option>
+                    <option value="IT" <#if employee.department?? && employee.department == "IT">selected</#if>>IT</option>
+                    <option value="Finance" <#if employee.department?? && employee.department == "Finance">selected</#if>>Finance</option>
+                    <option value="Marketing" <#if employee.department?? && employee.department == "Marketing">selected</#if>>Marketing</option>
+                </select>
+                <div class="error-message" id="department-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="role">Role*</label>
+                <input type="text" id="role" value="${employee.role!''}" required>
+                <div class="error-message" id="role-error"></div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" id="cancel-btn">Cancel</button>
+                <button type="submit" id="save-btn">Save</button>
+            </div>
+        </form>
+    </div>
+    
+    <script src="js/app.js"></script>
+</body>
+</html>
+-->
