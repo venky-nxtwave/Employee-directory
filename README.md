@@ -76,3 +76,7 @@ employee-directory/
 │   └── app.js         # Main application logic
 └── README.md          # Project documentation
 ```
+
+
+
+<img width="1440" height="900" alt="Image" src="https://github.com/user-attachments/assets/33abdb0d-3893-4b69-9bc7-70d6a50e5e1b" />
